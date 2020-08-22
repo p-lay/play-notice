@@ -11,11 +11,11 @@ let config = {
 
   orm: {
     type: 'mysql',
-    host: '',
+    host: 'localhost',
     port: 3310,
     username: 'root',
     password: '123456',
-    database: '',
+    database: 'nest_app',
     entities: [resolve(`./**/*.entity${isSit ? '.js' : '.ts'}`)],
     timezone: 'UTC',
     charset: 'utf8mb4',

@@ -2,10 +2,6 @@ export interface UserInfo {
   nickName: string
   avatarUrl: string
   gender: number
-  province: string
-  city: string
-  country: string
-  language: string
 }
 
 export interface GetUserInfoReq {
