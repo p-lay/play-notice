@@ -1,4 +1,4 @@
-import { Code } from '../../contract/global'
+import { Code } from '../contract/global'
 
 export class Exception {
   constructor(code: Code, message?: string) {
@@ -24,7 +24,7 @@ export class Exception {
         return 'no data in table'
       case 3000:
         return 'data has relation, cannot be delete'
-        case 3100:
+      case 3100:
         return 'duplicate data in table'
     }
   }

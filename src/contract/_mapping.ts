@@ -1,30 +1,30 @@
 export default {
   _config: {
-    promiseGenericRes: 'CommonRes'
+    promiseGenericRes: 'CommonRes',
   },
   user: {
     getUserInfo: {
       req: 'GetUserInfoReq',
-      res: 'GetUserInfoRes'
+      res: 'GetUserInfoRes',
     },
     updateUserInfo: {
-      req: 'UpdateUserInfoReq'
-    }
+      req: 'UpdateUserInfoReq',
+    },
   },
   resource: {
     _config: {
       disableController: true,
-      disableEntity: true
+      disableEntity: true,
     },
     addResource: {
-      req: 'AddResourceReq'
+      req: 'AddResourceReq',
     },
     getResource: {
       req: 'GetResourceReq',
-      res: 'GetResourceRes'
+      res: 'GetResourceRes',
     },
     deleteResource: {
-      req: 'DeleteResourceReq'
-    }
-  }
+      req: 'DeleteResourceReq',
+    },
+  },
 }
