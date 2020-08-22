@@ -1,0 +1,25 @@
+{
+  "name": "nest-app",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:matthew5-template/nest-app.git",
+  "author": "Matthew5 <jnwu@thoughtworks.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@nestjs/common": "^7.4.2",
+    "@nestjs/core": "^7.4.2",
+    "@nestjs/typeorm": "^7.1.0",
+    "lodash": "^4.17.20",
+    "nest-ts-code-gen": "^1.0.2",
+    "rimraf": "^3.0.2",
+    "typeorm": "^0.2.25",
+    "typescript": "^4.0.2"
+  },
+  "devDependencies": {
+    "eslint": "^7.7.0",
+    "nodemon": "^2.0.4",
+    "prettier": "^2.0.5",
+    "ts-node": "^9.0.0",
+    "tsconfig-paths": "^3.9.0"
+  }
+}
