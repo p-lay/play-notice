@@ -15,7 +15,7 @@ let config = {
     port: 3310,
     username: 'root',
     password: '123456',
-    database: 'nest_app',
+    database: 'notification',
     entities: [resolve(`./**/*.entity${isSit ? '.js' : '.ts'}`)],
     timezone: 'UTC',
     charset: 'utf8mb4',
