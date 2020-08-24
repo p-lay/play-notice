@@ -10,4 +10,15 @@ export default {
       res: 'GetFlightsRes',
     },
   },
+  schedule: {
+    addSchedule: {
+      req: 'AddScheduleReq',
+    },
+    deleteSchedule: {
+      req: 'DeleteScheduleReq',
+    },
+    getSchedule: {
+      res: 'GetScheduleRes',
+    },
+  },
 }
