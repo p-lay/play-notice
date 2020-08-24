@@ -4,7 +4,7 @@ export default {
     // disableController: false,
     // disableEntity: false,
   },
-  ctrip: {
+  flight: {
     getFlights: {
       req: 'GetFlightsReq',
       res: 'GetFlightsRes',

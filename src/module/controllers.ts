@@ -1,3 +1,3 @@
-import { CtripController } from '../controller/ctrip.controller'
+import { FlightController } from '../controller/flight.controller'
 
-export const controllers = [CtripController]
+export const controllers = [FlightController]

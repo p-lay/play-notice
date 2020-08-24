@@ -1,8 +1,8 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
 import { CommonEntity } from './common.entity'
 
-@Entity('ctrip')
-export class CtripEntity extends CommonEntity {
+@Entity('flight')
+export class FlightEntity extends CommonEntity {
   @PrimaryGeneratedColumn()
   id: string
 

@@ -1,15 +1,15 @@
 import { Injectable, Inject } from '@nestjs/common'
-import { GetFlightsReq, GetFlightsRes, FlightInfo } from '../contract/ctrip'
+import { GetFlightsReq, GetFlightsRes, FlightInfo } from '../contract/flight'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-import { CtripEntity } from '../entity/ctrip.entity'
+import { FlightEntity } from '../entity/flight.entity'
 import { getFlights } from 'src/api/ctrip.api'
 
 @Injectable()
-export class CtripService {
+export class FlightService {
   constructor(
-    @InjectRepository(CtripEntity)
-    readonly repo: Repository<CtripEntity>,
+    @InjectRepository(FlightEntity)
+    readonly repo: Repository<FlightEntity>,
   ) {}
 
   shakeFlightResult(result: any, param: GetFlightsReq) {
@@ -67,7 +67,7 @@ export class CtripService {
 
   async saveFlight(flights: FlightInfo[]) {
     const entities = flights.map((flight) => {
-      const entity = new CtripEntity()
+      const entity = new FlightEntity()
       Object.assign(entity, flight)
       return entity
     })

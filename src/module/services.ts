@@ -1,3 +1,3 @@
-import { CtripService } from '../service/ctrip.service'
+import { FlightService } from '../service/flight.service'
 
-export const services = [CtripService]
+export const services = [FlightService]

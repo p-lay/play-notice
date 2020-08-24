@@ -1,5 +1,5 @@
 import request from './request'
-import { GetFlightsReq } from 'src/contract/ctrip'
+import { GetFlightsReq } from 'src/contract/flight'
 import * as ctripConfig from 'src/config/ctrip.json'
 
 const cityMap = ctripConfig.cityMap

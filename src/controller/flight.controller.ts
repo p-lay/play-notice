@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Req, Res } from '@nestjs/common'
-import { CtripService } from '../service/ctrip.service'
+import { FlightService } from '../service/flight.service'
 import { CommonRes } from '../contract/global'
-import { GetFlightsReq, GetFlightsRes } from '../contract/ctrip'
+import { GetFlightsReq, GetFlightsRes } from '../contract/flight'
 
 @Controller()
-export class CtripController {
-  constructor(private readonly service: CtripService) {}
+export class FlightController {
+  constructor(private readonly service: FlightService) {}
 
   @Post('getFlights')
   async getFlights(@Body() param: GetFlightsReq): CommonRes<GetFlightsRes> {

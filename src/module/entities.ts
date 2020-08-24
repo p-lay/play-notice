@@ -1,3 +1,3 @@
-import { CtripEntity } from '../entity/ctrip.entity'
+import { FlightEntity } from '../entity/flight.entity'
 
-export const entities = [CtripEntity]
+export const entities = [FlightEntity]
