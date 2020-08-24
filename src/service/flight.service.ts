@@ -3,6 +3,7 @@ import { GetFlightsReq, GetFlightsRes, FlightInfo } from '../contract/flight'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { FlightEntity } from '../entity/flight.entity'
+import { FlightPriceChangeEntity } from '../entity/flightPriceChange.entity'
 import { getFlights } from 'src/api/ctrip.api'
 
 @Injectable()
@@ -10,6 +11,8 @@ export class FlightService {
   constructor(
     @InjectRepository(FlightEntity)
     readonly repo: Repository<FlightEntity>,
+    @InjectRepository(FlightEntity)
+    readonly priceChangeRepo: Repository<FlightPriceChangeEntity>,
   ) {}
 
   shakeFlightResult(result: any, param: GetFlightsReq) {
@@ -66,11 +69,31 @@ export class FlightService {
   }
 
   async saveFlight(flights: FlightInfo[]) {
-    const entities = flights.map((flight) => {
-      const entity = new FlightEntity()
-      Object.assign(entity, flight)
-      return entity
+    const flightEntities = []
+    const priceChangeEntities = []
+    flights.forEach(async (flight) => {
+      let entity = await this.repo.findOne({
+        flightId: flight.flightId,
+      })
+      if (!entity) {
+        entity = new FlightEntity()
+        Object.assign(entity, flight)
+        flightEntities.push(entity)
+      } else if (entity.price != flight.price) {
+        const priceChangeEntity = new FlightPriceChangeEntity()
+        priceChangeEntity.flightId = entity.flightId
+        priceChangeEntity.priceChangeFrom = entity.price
+        priceChangeEntity.priceChangeTo = flight.price
+        priceChangeEntities.push(priceChangeEntity)
+        entity.price = flight.price
+        flightEntities.push(entity)
+      }
     })
-    await this.repo.save(entities)
+    if (flightEntities.length) {
+      await this.repo.save(flightEntities)
+    }
+    if (priceChangeEntities.length) {
+      await this.priceChangeRepo.save(priceChangeEntities)
+    }
   }
 }
