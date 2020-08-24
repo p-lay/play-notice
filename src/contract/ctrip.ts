@@ -1,17 +1,14 @@
-export interface FlightAirportInfo {
-  airportName: string
-  flightTime: string
-}
-
 export interface FlightInfo {
-  id: string
+  flightId: string
   price: number
   tax: number
   airlineName: string
   airlineDescription: string
-  departureInfo: FlightAirportInfo
-  arrivalInfo: FlightAirportInfo
-  transferFlight?: boolean
+  departureAirportName: string
+  departureTime: string
+  arrivalAirportName: string
+  arrivalTime: string
+  stopTimes: number
 }
 
 export interface GetFlightsReq {

@@ -10,7 +10,8 @@
     "experimentalDecorators": true,
     "target": "es6",
     "outDir": "./dist",
-    "baseUrl": "./"
+    "baseUrl": "./",
+    "resolveJsonModule": true
   },
   "exclude": ["node_modules", "nest.gen.ts"]
 }

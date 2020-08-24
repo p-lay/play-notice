@@ -18,7 +18,6 @@ let config = {
     database: 'notification',
     entities: [resolve(`./**/*.entity${isSit ? '.js' : '.ts'}`)],
     timezone: 'UTC',
-    charset: 'utf8mb4',
     multipleStatements: true,
     dropSchema: false,
     synchronize: true,

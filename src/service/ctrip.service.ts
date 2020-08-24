@@ -1,9 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common'
-import {
-  GetFlightsReq,
-  GetFlightsRes,
-  FlightAirportInfo,
-} from '../contract/ctrip'
+import { GetFlightsReq, GetFlightsRes, FlightInfo } from '../contract/ctrip'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { CtripEntity } from '../entity/ctrip.entity'
@@ -21,6 +17,7 @@ export class CtripService {
       const rawFlights = result.data.routeList.map((item) => {
         const leg = item.legs[0]
         return {
+          type: item.routeType,
           flight: leg.flight,
           characteristic: leg.characteristic,
         }
@@ -29,7 +26,8 @@ export class CtripService {
         const isSameFromPort =
           param.fromPort ==
           raw.flight.departureAirportInfo.airportTlc.toLowerCase()
-        return !param.fromPort || isSameFromPort
+        const isDirectFlight = raw.type === 'Flight'
+        return isDirectFlight && (!param.fromPort || isSameFromPort)
       })
     } else {
       return []
@@ -40,29 +38,39 @@ export class CtripService {
     const result = await getFlights(param)
     const rawFlights = this.shakeFlightResult(result, param)
     const flights = rawFlights.map((raw) => {
-      return {
-        id: raw.flight.id,
-        price: raw.characteristic.lowestPrice,
+      const flight: FlightInfo = {
+        flightId: raw.flight.id,
+        // TODO: lowestPrice null, transitPrice, characteristic.standardPrices
+        price: raw.characteristic.lowestPrice || 0,
         tax: raw.flight.tax,
         airlineName: raw.flight.airlineName + raw.flight.flightNumber,
         airlineDescription: `${raw.flight.craftTypeName}(${raw.flight.craftTypeKindDisplayName})`,
-        departureInfo: {
-          airportName:
-            raw.flight.departureAirportInfo.airportName +
-            raw.flight.departureAirportInfo.terminal.shortName,
-          flightTime: raw.flight.departureDate,
-        },
-        arrivalInfo: {
-          airportName:
-            raw.flight.arrivalAirportInfo.airportName +
-            raw.flight.arrivalAirportInfo.terminal.shortName,
-          flightTime: raw.flight.arrivalDate,
-        },
-        transferFlight: raw.flight.stopTimes != 0,
+        departureAirportName:
+          raw.flight.departureAirportInfo.airportName +
+          raw.flight.departureAirportInfo.terminal.shortName,
+        departureTime: raw.flight.departureDate,
+        arrivalAirportName:
+          raw.flight.arrivalAirportInfo.airportName +
+          raw.flight.arrivalAirportInfo.terminal.shortName,
+        arrivalTime: raw.flight.arrivalDate,
+        stopTimes: raw.flight.stopTimes,
       }
+      return flight
     })
+
+    await this.saveFlight(flights)
+
     return {
       flights,
     }
+  }
+
+  async saveFlight(flights: FlightInfo[]) {
+    const entities = flights.map((flight) => {
+      const entity = new CtripEntity()
+      Object.assign(entity, flight)
+      return entity
+    })
+    await this.repo.save(entities)
   }
 }
