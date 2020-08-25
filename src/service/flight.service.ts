@@ -5,6 +5,7 @@ import { Repository } from 'typeorm'
 import { FlightEntity } from '../entity/flight.entity'
 import { FlightPriceChangeEntity } from '../entity/flightPriceChange.entity'
 import { getFlights } from 'src/api/ctrip.api'
+import * as dayjs from 'dayjs'
 
 @Injectable()
 export class FlightService {
@@ -41,8 +42,10 @@ export class FlightService {
     const result = await getFlights(param)
     const rawFlights = this.shakeFlightResult(result, param)
     const flights = rawFlights.map((raw) => {
+      const flightNumber = raw.flight.flightNumber
+      const timestamp = dayjs(raw.flight.departureDate).format('YYYY-MM-DD')
       const flight: FlightInfo = {
-        flightId: raw.flight.id,
+        flightId: `${flightNumber}_${timestamp}`,
         // TODO: lowestPrice null, transitPrice, characteristic.standardPrices
         price: raw.characteristic.lowestPrice || 0,
         tax: raw.flight.tax,
