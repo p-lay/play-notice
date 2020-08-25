@@ -61,17 +61,15 @@ export class FlightService {
       return flight
     })
 
-    await this.saveFlight(flights)
-
     return {
       flights,
     }
   }
 
-  async saveFlight(flights: FlightInfo[]) {
+  async checkAndGetFlightInfo(flights: FlightInfo[]) {
     const flightEntities = []
     const priceChangeEntities = []
-    flights.forEach(async (flight) => {
+    for (const flight of flights) {
       let entity = await this.repo.findOne({
         flightId: flight.flightId,
       })
@@ -88,7 +86,14 @@ export class FlightService {
         entity.price = flight.price
         flightEntities.push(entity)
       }
-    })
+    }
+    return {
+      flightEntities,
+      priceChangeEntities,
+    }
+  }
+
+  async saveFlightInfo({ flightEntities, priceChangeEntities }) {
     if (flightEntities.length) {
       await this.repo.save(flightEntities)
     }

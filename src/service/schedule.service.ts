@@ -19,7 +19,7 @@ export class ScheduleService {
     const entity = new ScheduleEntity()
     entity.type = param.type
     entity.name = param.name
-    entity.params = JSON.stringify(param.params)
+    entity.params = param.params
     await this.repo.save(entity)
     return null
   }
