@@ -7,6 +7,12 @@ import { FlightEntity } from 'src/entity/flight.entity'
 import { FlightPriceChangeEntity } from 'src/entity/flightPriceChange.entity'
 import { SmsFlightContent, SendSmsParam } from 'src/type/sms'
 import * as dayjs from 'dayjs'
+import {
+  FlightScheduleFilter,
+  FlightScheduleParam,
+} from 'src/type/flightSchedule'
+import { Schedule } from 'src/contract/schedule'
+import { GetFlightsReq } from 'src/contract/flight'
 
 @Injectable()
 export class FlightNoticeTask {
@@ -15,60 +21,130 @@ export class FlightNoticeTask {
     private scheduleService: ScheduleService,
   ) {}
 
-  @Cron(CronExpression.EVERY_MINUTE, { name: 'oneMinuteSchedule' })
-  async oneMinuteSchedule() {
+  @Cron(CronExpression.EVERY_5_MINUTES, { name: 'fiveMinuteSchedule' })
+  async fiveMinuteSchedule() {
     const res = await this.scheduleService.getSchedule(null)
 
     for (const schedule of res.schedules) {
-      // get flight data
-      const { flights } = await this.flightService.getFlights(schedule.params)
-
-      // prepare change data
-      const {
-        flightEntities,
-        priceChangeEntities,
-      } = await this.flightService.checkAndGetFlightInfo(flights)
-
-      // send change notification sms
-      const failedFlightIds = await this.generateAndSendSms({
-        flightEntities,
-        priceChangeEntities,
-        phoneNumbers: schedule.phoneNumbers,
-      })
-
-      // save change
-      const flightInfo = {
-        flightEntities: flightEntities.filter(
-          (x) => !failedFlightIds.includes(x.flightId),
-        ),
-        priceChangeEntities: priceChangeEntities.filter(
-          (x) => !failedFlightIds.includes(x.flightId),
-        ),
+      if (schedule.type === 'flight') {
+        await this.runFlightSchedule(schedule)
       }
-      await this.flightService.saveFlightInfo(flightInfo)
     }
   }
 
+  async runFlightSchedule(schedule: Schedule) {
+    const flightParams: FlightScheduleParam = schedule.params
+    const allHandlePromise = flightParams.dateList.map(async (date) => {
+      const { dateList, ...params }: any = flightParams
+      params.date = date
+      await this.handleFlight(schedule, params)
+    })
+
+    await Promise.all(allHandlePromise).catch((err) => {
+      console.error('handle flight error', err)
+    })
+  }
+
+  async handleFlight(schedule: Schedule, requestParams: GetFlightsReq) {
+    // get flight data
+    const { flights } = await this.flightService.getFlights(requestParams)
+
+    // prepare change data
+    const {
+      flightEntities,
+      priceChangeEntities,
+    } = await this.flightService.checkAndGetFlightInfo(flights)
+
+    // send change notification sms
+    const failedFlightIds = await this.generateAndSendSms({
+      flightEntities,
+      priceChangeEntities,
+      schedule,
+    })
+
+    // save change
+    const flightInfo = {
+      flightEntities: flightEntities.filter(
+        (x) => !failedFlightIds.includes(x.flightId),
+      ),
+      priceChangeEntities: priceChangeEntities.filter(
+        (x) => !failedFlightIds.includes(x.flightId),
+      ),
+    }
+    await this.flightService.saveFlightInfo(flightInfo)
+  }
+
+  isFlightInclude(
+    filter: FlightScheduleFilter,
+    priceChange: FlightPriceChangeEntity,
+    flight: FlightEntity,
+  ) {
+    if (priceChange.priceChangeTo > priceChange.priceChangeFrom) {
+      // 降价
+      return false
+    }
+    if (!filter) {
+      return true
+    }
+
+    if (
+      filter.highestPrice &&
+      priceChange.priceChangeTo > filter.highestPrice
+    ) {
+      // 最高价
+      return false
+    }
+    const time = dayjs(flight.departureTime).format('HH:MM')
+    if (filter.departureTimeBefore) {
+      if (dayjs(time).isAfter(dayjs(filter.departureTimeBefore))) {
+        // 出发时间早于条件
+        return false
+      }
+    }
+    if (filter.departureTimeAfter) {
+      if (dayjs(time).isBefore(dayjs(filter.departureTimeAfter))) {
+        // 出发时间晚于条件
+        return false
+      }
+    }
+    if (filter.departureTimeInterval?.length === 2) {
+      // 出发时间区间条件
+      if (dayjs(time).isBefore(dayjs(filter.departureTimeInterval[0]))) {
+        return false
+      }
+      if (dayjs(time).isAfter(dayjs(filter.departureTimeInterval[1]))) {
+        return false
+      }
+    }
+
+    return true
+  }
+
   async generateAndSendSms(param: {
-    phoneNumbers: string[]
+    schedule: Schedule
     flightEntities: FlightEntity[]
     priceChangeEntities: FlightPriceChangeEntity[]
   }) {
     const failedFlightIds = []
 
     for (const priceChange of param.priceChangeEntities) {
-      // TODO: 是否监听涨价
-      if (priceChange.priceChangeTo < priceChange.priceChangeFrom) {
-        const flightEntity = param.flightEntities.find(
-          (x) => x.flightId == priceChange.flightId,
+      const flightEntity = param.flightEntities.find(
+        (x) => x.flightId == priceChange.flightId,
+      )
+      if (
+        this.isFlightInclude(
+          param.schedule.filter as any,
+          priceChange,
+          flightEntity,
         )
+      ) {
         const content = {
           flight: `${flightEntity.airlineName}(${flightEntity.departureAirportName})`,
           time: dayjs(flightEntity.departureTime).format('MM月DD日HH:mm'),
           price: priceChange.priceChangeTo + flightEntity.tax,
         }
         const isSuccess = await this.sendSms({
-          phoneNumbers: param.phoneNumbers,
+          phoneNumbers: param.schedule.phoneNumbers,
           content,
         })
         if (!isSuccess) {
