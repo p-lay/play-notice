@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { Cron, CronExpression } from '@nestjs/schedule'
 import { FlightService } from './flight.service'
 import { ScheduleService } from './schedule.service'
-import { sendBatchSms } from 'src/api/sms.api'
+import { SendSms } from 'src/api/sms.api'
 import { FlightEntity } from 'src/entity/flight.entity'
 import { FlightPriceChangeEntity } from 'src/entity/flightPriceChange.entity'
 import { SmsFlightContent, SendSmsParam } from 'src/type/sms'
@@ -65,9 +65,7 @@ export class FlightNoticeTask {
         const content = {
           flight: `${flightEntity.airlineName}(${flightEntity.departureAirportName})`,
           time: dayjs(flightEntity.departureTime).format('MM月DD日HH:mm'),
-          price: `${priceChange.priceChangeTo + flightEntity.tax}(+${
-            flightEntity.tax
-          })`,
+          price: priceChange.priceChangeTo + flightEntity.tax,
         }
         const isSuccess = await this.sendSms({
           phoneNumbers: param.phoneNumbers,
@@ -88,8 +86,7 @@ export class FlightNoticeTask {
       type: 'flight',
       contentParam: param.content,
     }
-    console.log('sendSms params ======>', JSON.stringify(smsParam))
-    const res = await sendBatchSms(smsParam)
+    const res = await SendSms(smsParam)
     if (res.Code === 'OK') {
       return true
     } else {
