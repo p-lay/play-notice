@@ -20,7 +20,4 @@ export class FlightPriceChangeEntity extends CommonEntity {
     name: 'price_change_to',
   })
   priceChangeTo: number
-
-  @Column()
-  tax: number
 }

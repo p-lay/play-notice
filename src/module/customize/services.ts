@@ -1,3 +1,3 @@
-import { FlightTask } from 'src/service/flight.task'
+import { FlightNoticeTask } from 'src/service/flightNotice.task'
 
-export const customizeServices = [FlightTask]
+export const customizeServices = [FlightNoticeTask]

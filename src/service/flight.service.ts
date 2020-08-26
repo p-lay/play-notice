@@ -12,7 +12,7 @@ export class FlightService {
   constructor(
     @InjectRepository(FlightEntity)
     readonly repo: Repository<FlightEntity>,
-    @InjectRepository(FlightEntity)
+    @InjectRepository(FlightPriceChangeEntity)
     readonly priceChangeRepo: Repository<FlightPriceChangeEntity>,
   ) {}
 
