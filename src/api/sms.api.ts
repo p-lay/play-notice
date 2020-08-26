@@ -43,7 +43,7 @@ export const SendSms = (params: SendSmsParam): Promise<SendSmsResponse> => {
         )
     })
   } catch (err) {
-    console.log('error', err)
+    console.log('SendSms catch', err)
     return Promise.resolve({
       Code: 'error',
     }) as any

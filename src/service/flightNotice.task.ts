@@ -37,12 +37,14 @@ export class FlightNoticeTask {
     const allHandlePromise = flightParams.dateList.map(async (date) => {
       const { dateList, ...params }: any = flightParams
       params.date = date
-      await this.handleFlight(schedule, params)
+      try {
+        await this.handleFlight(schedule, params)
+      } catch (err) {
+        console.error('handle flight error', err)
+      }
     })
 
-    await Promise.all(allHandlePromise).catch((err) => {
-      console.error('handle flight error', err)
-    })
+    await Promise.all(allHandlePromise)
   }
 
   async handleFlight(schedule: Schedule, requestParams: GetFlightsReq) {
