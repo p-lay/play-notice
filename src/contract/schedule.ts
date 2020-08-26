@@ -6,12 +6,14 @@ interface Schedule {
   type: string
   params: any
   createdDate: string
+  phoneNumbers: string[]
 }
 
 export interface AddScheduleReq {
   type: ScheduleType
   name: string
-  params: any
+  params: string
+  phoneNumberJson: string
 }
 
 export interface DeleteScheduleReq {

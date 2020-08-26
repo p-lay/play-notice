@@ -15,4 +15,7 @@ export class ScheduleEntity extends CommonEntity {
 
   @Column(columnOption.json)
   params: string
+
+  @Column(columnOption.json)
+  phoneNumberJson: string
 }

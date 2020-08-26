@@ -33,7 +33,7 @@ export class FlightNoticeTask {
       const failedFlightIds = await this.generateAndSendSms({
         flightEntities,
         priceChangeEntities,
-        phoneNumbers: ['18512178680', '13072185650'],
+        phoneNumbers: schedule.phoneNumbers,
       })
 
       // save change
@@ -63,11 +63,11 @@ export class FlightNoticeTask {
           (x) => x.flightId == priceChange.flightId,
         )
         const content = {
-          flight: flightEntity.airlineName,
-          airport: flightEntity.departureAirportName,
+          flight: `${flightEntity.airlineName}(${flightEntity.departureAirportName})`,
           time: dayjs(flightEntity.departureTime).format('MM月DD日HH:mm'),
-          price: priceChange.priceChangeTo + flightEntity.tax,
-          tax: flightEntity.tax,
+          price: `${priceChange.priceChangeTo + flightEntity.tax}(+${
+            flightEntity.tax
+          })`,
         }
         const isSuccess = await this.sendSms({
           phoneNumbers: param.phoneNumbers,

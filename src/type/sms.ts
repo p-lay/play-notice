@@ -2,10 +2,8 @@ type SendSmsType = 'flight'
 
 export interface SmsFlightContent {
   flight: string
-  airport: string
   time: string
-  price: number
-  tax: number
+  price: string
 }
 
 export interface SendSmsParam {

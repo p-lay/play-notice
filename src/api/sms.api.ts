@@ -22,6 +22,7 @@ export const sendBatchSms = (
     ...apiConfig,
     TemplateCode: smsTemplate[params.type],
     TemplateParamJson: JSON.stringify(params.contentParam),
+    PhoneNumberJson: JSON.stringify(params.phoneNumbers),
   }
   return new Promise((resolve, reject) => {
     client

@@ -20,15 +20,16 @@ export class ScheduleService {
     entity.type = param.type
     entity.name = param.name
     entity.params = param.params
-    await this.repo.save(entity)
-    return null
+    entity.phoneNumberJson = param.phoneNumberJson
+    const res = await this.repo.save(entity)
+    return !!res
   }
 
   async deleteSchedule(param: DeleteScheduleReq): Promise<any> {
-    await this.repo.delete({
+    const res = await this.repo.delete({
       id: param.scheduleId,
     })
-    return null
+    return res
   }
 
   async getSchedule(param: any): Promise<GetScheduleRes> {
@@ -40,6 +41,7 @@ export class ScheduleService {
         type: entity.type,
         params: JSON.parse(entity.params),
         createdDate: entity.create_time.toString(),
+        phoneNumbers: JSON.parse(entity.phoneNumberJson),
       }
     })
     return {
