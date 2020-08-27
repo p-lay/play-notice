@@ -69,9 +69,10 @@ export class FlightNoticeTask {
 
   async handleFlight(schedule: Schedule, requestParams: GetFlightsReq) {
     // get flight data
-    this.logger.log(`getFlights params: ${JSON.stringify(requestParams)}`)
     const { flights } = await this.flightService.getFlights(requestParams)
-    this.logger.log(`find flights: ${flights.length}`)
+    this.logger.log(
+      `getFlights: ${flights.length}, params: ${JSON.stringify(requestParams)}`,
+    )
 
     // prepare change data
     const {
@@ -104,7 +105,7 @@ export class FlightNoticeTask {
     flight: FlightEntity,
   ) {
     this.logger.log(
-      `flight price change info: ${JSON.stringify(
+      `[PriceChange] flight price change info: ${JSON.stringify(
         priceChange,
       )}, filter: ${JSON.stringify(filter)}`,
     )
