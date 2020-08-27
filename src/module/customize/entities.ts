@@ -1,3 +1,3 @@
-import { FlightPriceChangeEntity } from 'src/entity/flightPriceChange.entity'
+import { FlightPriceChangeEntity } from '@/entity/flightPriceChange.entity'
 
 export const customizeEntities = [FlightPriceChangeEntity]

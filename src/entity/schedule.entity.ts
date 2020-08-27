@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
 import { CommonEntity } from './common.entity'
-import { columnOption } from 'src/util/entity'
+import { columnOption } from '@/util/entity'
 
 @Entity('schedule')
 export class ScheduleEntity extends CommonEntity {

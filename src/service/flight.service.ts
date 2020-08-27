@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { FlightEntity } from '../entity/flight.entity'
 import { FlightPriceChangeEntity } from '../entity/flightPriceChange.entity'
-import { getFlights } from 'src/api/ctrip.api'
+import { getFlights } from '@/api/ctrip.api'
 import * as dayjs from 'dayjs'
 
 @Injectable()

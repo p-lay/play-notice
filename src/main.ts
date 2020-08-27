@@ -1,3 +1,4 @@
+import './resolveAliasPath'
 import { NestFactory } from '@nestjs/core'
 import { AppModule } from './module/app.module'
 import { config } from './config'

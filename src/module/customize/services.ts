@@ -1,3 +1,3 @@
-import { FlightNoticeTask } from 'src/service/flightNotice.task'
+import { FlightNoticeTask } from '@/service/flightNotice.task'
 
 export const customizeServices = [FlightNoticeTask]

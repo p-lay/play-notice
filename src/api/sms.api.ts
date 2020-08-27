@@ -1,9 +1,7 @@
 import * as Core from '@alicloud/pop-core'
-import * as secret from 'src/config/secret.json'
-import * as smsTemplate from 'src/config/smsTemplate.json'
-import { SendSmsParam, SendSmsResponse } from 'src/type/sms'
-
-console.log('secret', secret.sms)
+import * as secret from '@/config/secret.json'
+import * as smsTemplate from '@/config/smsTemplate.json'
+import { SendSmsParam, SendSmsResponse } from '@/type/sms'
 
 var client = new Core({
   accessKeyId: secret.sms.accessKeyId,

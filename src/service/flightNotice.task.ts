@@ -2,17 +2,17 @@ import { Injectable } from '@nestjs/common'
 import { Cron, CronExpression } from '@nestjs/schedule'
 import { FlightService } from './flight.service'
 import { ScheduleService } from './schedule.service'
-import { SendSms } from 'src/api/sms.api'
-import { FlightEntity } from 'src/entity/flight.entity'
-import { FlightPriceChangeEntity } from 'src/entity/flightPriceChange.entity'
-import { SmsFlightContent, SendSmsParam } from 'src/type/sms'
+import { SendSms } from '@/api/sms.api'
+import { FlightEntity } from '@/entity/flight.entity'
+import { FlightPriceChangeEntity } from '@/entity/flightPriceChange.entity'
+import { SmsFlightContent, SendSmsParam } from '@/type/sms'
 import * as dayjs from 'dayjs'
 import {
   FlightScheduleFilter,
   FlightScheduleParam,
-} from 'src/type/flightSchedule'
-import { Schedule } from 'src/contract/schedule'
-import { GetFlightsReq } from 'src/contract/flight'
+} from '@/type/flightSchedule'
+import { Schedule } from '@/contract/schedule'
+import { GetFlightsReq } from '@/contract/flight'
 
 @Injectable()
 export class FlightNoticeTask {

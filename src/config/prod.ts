@@ -1,9 +1,8 @@
 import { resolve } from 'path'
 
 export default {
-  port: 3001,
   orm: {
-    database: 'play_prod',
+    database: 'notice_prod',
     entities: [resolve(`./**/*.entity.js`)],
   },
 }

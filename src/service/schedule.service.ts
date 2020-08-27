@@ -7,7 +7,7 @@ import {
 } from '../contract/schedule'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-import { ScheduleEntity } from 'src/entity/schedule.entity'
+import { ScheduleEntity } from '@/entity/schedule.entity'
 
 @Injectable()
 export class ScheduleService {
