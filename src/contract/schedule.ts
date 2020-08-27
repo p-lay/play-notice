@@ -8,6 +8,8 @@ export interface Schedule {
   filter?: any
   createdDate: string
   phoneNumbers: string[]
+  scheduleAfterTime: string
+  scheduleBeforeTime: string
 }
 
 export interface AddScheduleReq {

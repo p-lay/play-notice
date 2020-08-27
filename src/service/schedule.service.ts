@@ -45,6 +45,8 @@ export class ScheduleService {
         filter: entity.filter ? JSON.parse(entity.filter) : null,
         createdDate: entity.create_time.toString(),
         phoneNumbers: JSON.parse(entity.phoneNumberJson),
+        scheduleAfterTime: entity.scheduleAfterTime,
+        scheduleBeforeTime: entity.scheduleBeforeTime,
       }
     })
     return {

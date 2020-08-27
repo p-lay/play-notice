@@ -21,4 +21,16 @@ export class ScheduleEntity extends CommonEntity {
 
   @Column(columnOption.json)
   phoneNumberJson: string
+
+  @Column({
+    name: 'schedule_after_time',
+    default: '07:00',
+  })
+  scheduleAfterTime: string
+
+  @Column({
+    name: 'schedule_before_time',
+    default: '23:00',
+  })
+  scheduleBeforeTime: string
 }

@@ -13,6 +13,7 @@ import {
 } from '@/type/flightSchedule'
 import { Schedule } from '@/contract/schedule'
 import { GetFlightsReq } from '@/contract/flight'
+import { getDayjsTime } from '@/util/flight'
 
 @Injectable()
 export class FlightNoticeTask {
@@ -22,14 +23,28 @@ export class FlightNoticeTask {
     private scheduleService: ScheduleService,
   ) {}
 
-  @Cron(CronExpression.EVERY_10_MINUTES, { name: 'tenMinuteSchedule' })
+  @Cron('0 */20 * * * *', { name: 'noticeSchedule' })
   async runSchedule() {
-    this.logger.log('start schedule')
+    const currentTime = dayjs()
+    this.logger.log(`start schedule at ${currentTime.format()}`)
     const res = await this.scheduleService.getSchedule(null)
 
-    this.logger.log(`schedule count: ${res.schedules.length}`)
-
     for (const schedule of res.schedules) {
+      const scheduleAfterTime = getDayjsTime(schedule.scheduleAfterTime)
+      const scheduleBeforeTime = getDayjsTime(schedule.scheduleBeforeTime)
+
+      if (currentTime.isBefore(scheduleAfterTime)) {
+        this.logger.warn(
+          `schedule skip by scheduleAfterTime: ${schedule.scheduleAfterTime}`,
+        )
+        continue
+      } else if (currentTime.isAfter(scheduleBeforeTime)) {
+        this.logger.warn(
+          `schedule skip by scheduleBeforeTime: ${schedule.scheduleBeforeTime}`,
+        )
+        continue
+      }
+
       if (schedule.type === 'flight') {
         await this.runFlightSchedule(schedule)
       }
@@ -54,8 +69,9 @@ export class FlightNoticeTask {
 
   async handleFlight(schedule: Schedule, requestParams: GetFlightsReq) {
     // get flight data
-    this.logger.log(`handleFlight params: ${JSON.stringify(requestParams)}`)
+    this.logger.log(`getFlights params: ${JSON.stringify(requestParams)}`)
     const { flights } = await this.flightService.getFlights(requestParams)
+    this.logger.log(`find flights: ${flights.length}`)
 
     // prepare change data
     const {
@@ -87,11 +103,19 @@ export class FlightNoticeTask {
     priceChange: FlightPriceChangeEntity,
     flight: FlightEntity,
   ) {
+    this.logger.log(
+      `flight price change info: ${JSON.stringify(
+        priceChange,
+      )}, filter: ${JSON.stringify(filter)}`,
+    )
+
     if (priceChange.priceChangeTo > priceChange.priceChangeFrom) {
       // 降价
+      this.logger.warn(`flight exclude by price increase`)
       return false
     }
     if (!filter) {
+      this.logger.log(`flight include by no filter`)
       return true
     }
 
@@ -100,31 +124,56 @@ export class FlightNoticeTask {
       priceChange.priceChangeTo > filter.highestPrice
     ) {
       // 最高价
+      this.logger.warn(`flight exclude by highestPrice`)
       return false
     }
-    const time = dayjs(flight.departureTime).format('HH:MM')
+    const currentTime = dayjs(flight.departureTime)
+    const dayTimeStr = currentTime.format('YYYY-MM-DD')
+    this.logger.log(`flight departureTime: ${currentTime.format()}`)
     if (filter.departureTimeBefore) {
-      if (dayjs(time).isAfter(dayjs(filter.departureTimeBefore))) {
+      const departureTimeBefore = getDayjsTime(
+        filter.departureTimeBefore,
+        dayTimeStr,
+      )
+      this.logger.log(`departureTimeBefore: ${departureTimeBefore.format()}`)
+      if (currentTime.isAfter(departureTimeBefore)) {
         // 出发时间早于条件
+        this.logger.warn(`flight exclude by departure time after select`)
         return false
       }
     }
     if (filter.departureTimeAfter) {
-      if (dayjs(time).isBefore(dayjs(filter.departureTimeAfter))) {
+      const departureTimeAfter = getDayjsTime(
+        filter.departureTimeAfter,
+        dayTimeStr,
+      )
+      this.logger.log(`departureTimeAfter: ${departureTimeAfter.format()}`)
+      if (currentTime.isBefore(departureTimeAfter)) {
         // 出发时间晚于条件
+        this.logger.warn(`flight exclude by departure time before select`)
         return false
       }
     }
     if (filter.departureTimeInterval?.length === 2) {
       // 出发时间区间条件
-      if (dayjs(time).isBefore(dayjs(filter.departureTimeInterval[0]))) {
+      const startTime = getDayjsTime(
+        filter.departureTimeInterval[0],
+        dayTimeStr,
+      )
+      const endTime = getDayjsTime(filter.departureTimeInterval[1], dayTimeStr)
+      this.logger.log(`departureTimeInterval[0]: ${startTime.format()}`)
+      this.logger.log(`departureTimeInterval[1]: ${endTime.format()}`)
+      if (currentTime.isBefore(startTime)) {
+        this.logger.warn(`flight exclude by departure time not in interval`)
         return false
       }
-      if (dayjs(time).isAfter(dayjs(filter.departureTimeInterval[1]))) {
+      if (currentTime.isAfter(endTime)) {
+        this.logger.warn(`flight exclude by departure time not in interval`)
         return false
       }
     }
 
+    this.logger.log(`flight include after all`)
     return true
   }
 
