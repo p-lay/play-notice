@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { Cron, CronExpression } from '@nestjs/schedule'
 import { FlightService } from './flight.service'
 import { ScheduleService } from './schedule.service'
@@ -16,6 +16,7 @@ import { GetFlightsReq } from '@/contract/flight'
 
 @Injectable()
 export class FlightNoticeTask {
+  private readonly logger = new Logger(FlightNoticeTask.name)
   constructor(
     private flightService: FlightService,
     private scheduleService: ScheduleService,
@@ -23,7 +24,10 @@ export class FlightNoticeTask {
 
   @Cron(CronExpression.EVERY_5_MINUTES, { name: 'fiveMinuteSchedule' })
   async fiveMinuteSchedule() {
+    this.logger.log('start schedule by EVERY_5_MINUTES')
     const res = await this.scheduleService.getSchedule(null)
+
+    this.logger.log(`schedule count: ${res.schedules.length}`)
 
     for (const schedule of res.schedules) {
       if (schedule.type === 'flight') {
@@ -33,6 +37,7 @@ export class FlightNoticeTask {
   }
 
   async runFlightSchedule(schedule: Schedule) {
+    this.logger.log(`run flight schedule`)
     const flightParams: FlightScheduleParam = schedule.params
     const allHandlePromise = flightParams.dateList.map(async (date) => {
       const { dateList, ...params }: any = flightParams
@@ -40,7 +45,7 @@ export class FlightNoticeTask {
       try {
         await this.handleFlight(schedule, params)
       } catch (err) {
-        console.error('handle flight error', err)
+        this.logger.error(`'handle flight error: ${err.message}`)
       }
     })
 
@@ -49,6 +54,7 @@ export class FlightNoticeTask {
 
   async handleFlight(schedule: Schedule, requestParams: GetFlightsReq) {
     // get flight data
+    this.logger.log(`handleFlight params: ${JSON.stringify(requestParams)}`)
     const { flights } = await this.flightService.getFlights(requestParams)
 
     // prepare change data
@@ -164,7 +170,7 @@ export class FlightNoticeTask {
       type: 'flight',
       contentParam: param.content,
     }
-    const res = await SendSms(smsParam)
+    const res = await SendSms(smsParam, this.logger)
     if (res.Code === 'OK') {
       return true
     } else {

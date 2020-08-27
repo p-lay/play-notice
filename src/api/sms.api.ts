@@ -2,6 +2,7 @@ import * as Core from '@alicloud/pop-core'
 import * as secret from '@/config/secret.json'
 import * as smsTemplate from '@/config/smsTemplate.json'
 import { SendSmsParam, SendSmsResponse } from '@/type/sms'
+import { Logger } from '@nestjs/common'
 
 var client = new Core({
   accessKeyId: secret.sms.accessKeyId,
@@ -15,7 +16,10 @@ const apiConfig = {
   SignName: '屁蕾',
 }
 
-export const SendSms = (params: SendSmsParam): Promise<SendSmsResponse> => {
+export const SendSms = (
+  params: SendSmsParam,
+  logger: Logger,
+): Promise<SendSmsResponse> => {
   const apiParams = {
     ...apiConfig,
     TemplateCode: smsTemplate[params.type],
@@ -24,24 +28,24 @@ export const SendSms = (params: SendSmsParam): Promise<SendSmsResponse> => {
   }
   try {
     return new Promise((resolve, reject) => {
-      console.log('SendSms param', apiParams)
+      logger.log(`SendSms param: ${JSON.stringify(apiParams)}`)
       client
         .request('SendSms', apiParams, {
           method: 'POST',
         })
         .then(
           (result: any) => {
-            console.log('SendSms result', JSON.stringify(result))
+            logger.log(`SendSms result: ${JSON.stringify(result)}`)
             resolve(result)
           },
           (ex) => {
-            console.log('SendSms error', ex)
+            logger.error(`SendSms error: ${ex}`)
             reject()
           },
         )
     })
   } catch (err) {
-    console.log('SendSms catch', err)
+    logger.error(`SendSms catch: ${err}`)
     return Promise.resolve({
       Code: 'error',
     }) as any

@@ -5,5 +5,6 @@ export default {
     host: '172.17.0.1',
     database: 'notice_prod',
     entities: [resolve(`./**/*.entity.js`)],
+    logging: false,
   },
 }
