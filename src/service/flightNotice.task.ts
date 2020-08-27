@@ -22,9 +22,9 @@ export class FlightNoticeTask {
     private scheduleService: ScheduleService,
   ) {}
 
-  @Cron(CronExpression.EVERY_5_MINUTES, { name: 'fiveMinuteSchedule' })
-  async fiveMinuteSchedule() {
-    this.logger.log('start schedule by EVERY_5_MINUTES')
+  @Cron(CronExpression.EVERY_10_MINUTES, { name: 'tenMinuteSchedule' })
+  async runSchedule() {
+    this.logger.log('start schedule')
     const res = await this.scheduleService.getSchedule(null)
 
     this.logger.log(`schedule count: ${res.schedules.length}`)

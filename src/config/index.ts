@@ -21,7 +21,7 @@ let config = {
     multipleStatements: true,
     dropSchema: false,
     synchronize: true,
-    logging: true,
+    logging: false,
   },
 }
 

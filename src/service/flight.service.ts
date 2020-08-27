@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { GetFlightsReq, GetFlightsRes, FlightInfo } from '../contract/flight'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
@@ -9,6 +9,7 @@ import * as dayjs from 'dayjs'
 
 @Injectable()
 export class FlightService {
+  private readonly logger = new Logger(FlightService.name)
   constructor(
     @InjectRepository(FlightEntity)
     readonly repo: Repository<FlightEntity>,
@@ -34,6 +35,7 @@ export class FlightService {
         return isDirectFlight && (!param.fromPort || isSameFromPort)
       })
     } else {
+      this.logger.log(`getFlights empty result: ${JSON.stringify(result)}`)
       return []
     }
   }

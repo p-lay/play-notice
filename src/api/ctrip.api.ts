@@ -25,6 +25,7 @@ const convertToCtripParams = (params: GetFlightsReq) => {
     ],
     selectedInfos: null,
     army: false,
+    token: ctripConfig.token,
   }
 }
 
