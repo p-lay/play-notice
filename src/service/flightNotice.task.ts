@@ -121,7 +121,7 @@ export class FlightNoticeTask {
 
     if (
       filter.highestPrice &&
-      priceChange.priceChangeTo > filter.highestPrice
+      priceChange.priceChangeTo + flight.tax > filter.highestPrice
     ) {
       // 最高价
       this.logger.warn(`flight exclude by highestPrice`)
