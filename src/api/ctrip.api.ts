@@ -31,8 +31,18 @@ const convertToCtripParams = (params: GetFlightsReq) => {
 
 export const getFlights = (params: GetFlightsReq) => {
   const flightParams = convertToCtripParams(params)
+  const referer = `https://flights.ctrip.com/itinerary/oneway/${params.from},${
+    params.fromPort || params.from
+  }-${params.to}?date=${params.date}`
+
   return request.post(
     'https://flights.ctrip.com/itinerary/api/12808/products',
     flightParams,
+    {
+      headers: {
+        origin: 'https://flights.ctrip.com',
+        referer,
+      },
+    },
   )
 }

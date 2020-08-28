@@ -30,8 +30,14 @@ export class FlightNoticeTask {
     const res = await this.scheduleService.getSchedule(null)
 
     for (const schedule of res.schedules) {
-      const scheduleAfterTime = getDayjsTime(schedule.scheduleAfterTime)
-      const scheduleBeforeTime = getDayjsTime(schedule.scheduleBeforeTime)
+      const scheduleAfterTime = getDayjsTime(
+        this.logger,
+        schedule.scheduleAfterTime,
+      )
+      const scheduleBeforeTime = getDayjsTime(
+        this.logger,
+        schedule.scheduleBeforeTime,
+      )
 
       if (currentTime.isBefore(scheduleAfterTime)) {
         this.logger.warn(
@@ -133,6 +139,7 @@ export class FlightNoticeTask {
     this.logger.log(`flight departureTime: ${currentTime.format()}`)
     if (filter.departureTimeBefore) {
       const departureTimeBefore = getDayjsTime(
+        this.logger,
         filter.departureTimeBefore,
         dayTimeStr,
       )
@@ -145,6 +152,7 @@ export class FlightNoticeTask {
     }
     if (filter.departureTimeAfter) {
       const departureTimeAfter = getDayjsTime(
+        this.logger,
         filter.departureTimeAfter,
         dayTimeStr,
       )
@@ -158,10 +166,15 @@ export class FlightNoticeTask {
     if (filter.departureTimeInterval?.length === 2) {
       // 出发时间区间条件
       const startTime = getDayjsTime(
+        this.logger,
         filter.departureTimeInterval[0],
         dayTimeStr,
       )
-      const endTime = getDayjsTime(filter.departureTimeInterval[1], dayTimeStr)
+      const endTime = getDayjsTime(
+        this.logger,
+        filter.departureTimeInterval[1],
+        dayTimeStr,
+      )
       this.logger.log(`departureTimeInterval[0]: ${startTime.format()}`)
       this.logger.log(`departureTimeInterval[1]: ${endTime.format()}`)
       if (currentTime.isBefore(startTime)) {
