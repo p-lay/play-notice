@@ -1,11 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { Cron, CronExpression } from '@nestjs/schedule'
 import { FlightService } from './flight.service'
-import { ScheduleService } from './schedule.service'
-import { SendSms } from '@/api/sms.api'
 import { FlightEntity } from '@/entity/flight.entity'
 import { FlightPriceChangeEntity } from '@/entity/flightPriceChange.entity'
-import { SmsFlightContent, SendSmsReq } from '@/contract/sms'
 import * as dayjs from 'dayjs'
 import {
   FlightScheduleFilter,
@@ -14,46 +10,17 @@ import {
 import { Schedule } from '@/contract/schedule'
 import { GetFlightsReq } from '@/contract/flight'
 import { getDayjsTime } from '@/util/flight'
+import { SmsService } from './sms.service'
 
 @Injectable()
-export class FlightNoticeTask {
-  private readonly logger = new Logger(FlightNoticeTask.name)
+export class FlightNoticeService {
+  private readonly logger = new Logger(FlightNoticeService.name)
   constructor(
     private flightService: FlightService,
-    private scheduleService: ScheduleService,
+    private smsService: SmsService,
   ) {}
 
-  @Cron('0 */20 * * * *', { name: 'noticeSchedule' })
-  async runSchedule() {
-    const currentTime = dayjs()
-    this.logger.log(`start schedule at ${currentTime.format()}`)
-    const res = await this.scheduleService.getSchedule(null)
-
-    for (const schedule of res.schedules) {
-      const scheduleAfterTime = getDayjsTime(schedule.scheduleAfterTime)
-      const scheduleBeforeTime = getDayjsTime(schedule.scheduleBeforeTime)
-
-      if (currentTime.isBefore(scheduleAfterTime)) {
-        this.logger.warn(
-          `schedule skip by scheduleAfterTime: ${schedule.scheduleAfterTime}`,
-        )
-        continue
-      } else if (currentTime.isAfter(scheduleBeforeTime)) {
-        this.logger.warn(
-          `schedule skip by scheduleBeforeTime: ${
-            schedule.scheduleBeforeTime
-          }, ${currentTime.format()}, ${scheduleBeforeTime.format()}`,
-        )
-        continue
-      }
-
-      if (schedule.type === 'flight') {
-        await this.runFlightSchedule(schedule)
-      }
-    }
-  }
-
-  async runFlightSchedule(schedule: Schedule) {
+  async handleSchedule(schedule: Schedule) {
     this.logger.log(`run flight schedule`)
     const flightParams: FlightScheduleParam = schedule.params
     const allHandlePromise = flightParams.dateList.map(async (date) => {
@@ -203,9 +170,10 @@ export class FlightNoticeTask {
           time: dayjs(flightEntity.departureTime).format('MM月DD日HH:mm'),
           price: priceChange.priceChangeTo + flightEntity.tax,
         }
-        const isSuccess = await this.sendSms({
+        const isSuccess = await this.smsService.sendSms({
           phoneNumbers: param.schedule.phoneNumbers,
-          content,
+          type: 'flight',
+          contentParam: content,
         })
         if (!isSuccess) {
           failedFlightIds.push(flightEntity.flightId)
@@ -214,19 +182,5 @@ export class FlightNoticeTask {
     }
 
     return failedFlightIds
-  }
-
-  async sendSms(param: { phoneNumbers: string[]; content: SmsFlightContent }) {
-    const smsParam: SendSmsReq = {
-      phoneNumbers: param.phoneNumbers,
-      type: 'flight',
-      contentParam: param.content,
-    }
-    const res = await SendSms(smsParam, this.logger)
-    if (res.Code === 'OK') {
-      return true
-    } else {
-      return false
-    }
   }
 }

@@ -21,4 +21,12 @@ export default {
       res: 'GetScheduleRes',
     },
   },
+  sms: {
+    _config: {
+      disableController: true,
+    },
+    sendSms: {
+      req: 'SendSmsReq',
+    },
+  },
 }

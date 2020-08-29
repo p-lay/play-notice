@@ -8,8 +8,8 @@ export interface SmsFlightContent {
 
 export interface SendAliSmsResponse {
   Message: string
-  Code: 'OK' | 'isv.MOBILE_NUMBER_ILLEGAL'
-  RequestId: string
+  Code: 'OK' | 'isv.MOBILE_NUMBER_ILLEGAL' | 'error'
+  RequestId?: string
 }
 
 export interface SendSmsReq {

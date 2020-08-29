@@ -16,7 +16,7 @@ const apiConfig = {
   SignName: '屁蕾',
 }
 
-export const SendSms = (
+export const sendSms = (
   params: SendSmsReq,
   logger: Logger,
 ): Promise<SendAliSmsResponse> => {
@@ -40,14 +40,18 @@ export const SendSms = (
           },
           (ex) => {
             logger.error(`SendSms error: ${ex}`)
-            reject()
+            resolve({
+              Message: 'catch ali sms error',
+              Code: 'error',
+            })
           },
         )
     })
   } catch (err) {
     logger.error(`SendSms catch: ${err}`)
     return Promise.resolve({
+      Message: 'catch wrapper error',
       Code: 'error',
-    }) as any
+    })
   }
 }
