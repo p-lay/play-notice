@@ -27,21 +27,22 @@ export class FlightNoticeService {
       const { dateList, ...params }: any = flightParams
       params.date = date
       try {
+        this.logger.log(`handleFlight params: ${JSON.stringify(params)}`)
         await this.handleFlight(schedule, params)
+        this.logger.log('finish handle')
       } catch (err) {
         this.logger.error(`'handle flight error: ${err.message}`)
       }
     })
 
     await Promise.all(allHandlePromise)
+    this.logger.log(`finish flight schedule`)
   }
 
   async handleFlight(schedule: Schedule, requestParams: GetFlightsReq) {
     // get flight data
     const { flights } = await this.flightService.getFlights(requestParams)
-    this.logger.log(
-      `getFlights: ${flights.length}, params: ${JSON.stringify(requestParams)}`,
-    )
+    this.logger.log(`getFlights count: ${flights.length}`)
 
     // prepare change data
     const {
@@ -165,6 +166,7 @@ export class FlightNoticeService {
           flightEntity,
         )
       ) {
+        this.logger.log('[FlightInclude]')
         const content = {
           flight: `${flightEntity.airlineName}(${flightEntity.departureAirportName})`,
           time: dayjs(flightEntity.departureTime).format('MM月DD日HH:mm'),
@@ -178,6 +180,8 @@ export class FlightNoticeService {
         if (!isSuccess) {
           failedFlightIds.push(flightEntity.flightId)
         }
+      } else {
+        this.logger.log('[FlightExclude]')
       }
     }
 
