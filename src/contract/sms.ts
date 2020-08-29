@@ -6,14 +6,14 @@ export interface SmsFlightContent {
   price: number
 }
 
-export interface SendSmsParam {
-  phoneNumbers: string[]
-  type: SendSmsType
-  contentParam: Object
-}
-
-export interface SendSmsResponse {
+export interface SendAliSmsResponse {
   Message: string
   Code: 'OK' | 'isv.MOBILE_NUMBER_ILLEGAL'
   RequestId: string
+}
+
+export interface SendSmsReq {
+  phoneNumbers: string[]
+  type: SendSmsType
+  contentParam: Object
 }

@@ -1,7 +1,7 @@
 import * as Core from '@alicloud/pop-core'
 import * as secret from '@/config/secret.json'
 import * as smsTemplate from '@/config/smsTemplate.json'
-import { SendSmsParam, SendSmsResponse } from '@/type/sms'
+import { SendSmsReq, SendAliSmsResponse } from '@/contract/sms'
 import { Logger } from '@nestjs/common'
 
 var client = new Core({
@@ -17,9 +17,9 @@ const apiConfig = {
 }
 
 export const SendSms = (
-  params: SendSmsParam,
+  params: SendSmsReq,
   logger: Logger,
-): Promise<SendSmsResponse> => {
+): Promise<SendAliSmsResponse> => {
   const apiParams = {
     ...apiConfig,
     TemplateCode: smsTemplate[params.type],
