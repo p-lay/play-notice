@@ -10,6 +10,7 @@ export interface Schedule {
   phoneNumbers: string[]
   scheduleAfterTime: string
   scheduleBeforeTime: string
+  scheduleDelayDayjsTime: any
 }
 
 export interface AddScheduleReq {

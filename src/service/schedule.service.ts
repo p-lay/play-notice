@@ -8,6 +8,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { ScheduleEntity } from '@/entity/schedule.entity'
+import dayjs from 'dayjs'
 
 @Injectable()
 export class ScheduleService {
@@ -47,10 +48,28 @@ export class ScheduleService {
         phoneNumbers: JSON.parse(entity.phoneNumberJson),
         scheduleAfterTime: entity.scheduleAfterTime,
         scheduleBeforeTime: entity.scheduleBeforeTime,
+        scheduleDelayDayjsTime: dayjs(entity.scheduleDelayTime),
       }
     })
     return {
       schedules,
+    }
+  }
+
+  async updateDelayTime(scheduleId: string, delay: boolean) {
+    const entity = await this.repo.findOne({
+      id: scheduleId,
+    })
+    if (delay) {
+      if (!entity.scheduleDelayTime) {
+        entity.scheduleDelayTime = dayjs().add(2, 'hour').format()
+        await this.repo.save(entity)
+      }
+    } else {
+      if (entity.scheduleDelayTime) {
+        entity.scheduleDelayTime = ''
+        await this.repo.save(entity)
+      }
     }
   }
 }

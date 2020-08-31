@@ -37,6 +37,16 @@ export class NoticeSchedule {
         continue
       }
 
+      if (
+        schedule.scheduleDelayDayjsTime &&
+        currentTime.isBefore(schedule.scheduleDelayDayjsTime)
+      ) {
+        this.logger.warn(
+          `schedule skip by scheduleDelayTime: ${currentTime.format()}, ${schedule.scheduleDelayDayjsTime.format()}`,
+        )
+        continue
+      }
+
       if (schedule.type === 'flight') {
         await this.flightNoticeService.handleSchedule(schedule)
       }

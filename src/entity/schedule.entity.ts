@@ -33,4 +33,10 @@ export class ScheduleEntity extends CommonEntity {
     default: '23:00',
   })
   scheduleBeforeTime: string
+
+  @Column({
+    name: 'schedule_delay_time',
+    default: '',
+  })
+  scheduleDelayTime: string
 }

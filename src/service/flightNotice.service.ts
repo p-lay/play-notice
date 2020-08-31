@@ -11,6 +11,7 @@ import { Schedule } from '@/contract/schedule'
 import { GetFlightsReq } from '@/contract/flight'
 import { getDayjsTime } from '@/util/flight'
 import { SmsService } from './sms.service'
+import { ScheduleService } from './schedule.service'
 
 @Injectable()
 export class FlightNoticeService {
@@ -18,6 +19,7 @@ export class FlightNoticeService {
   constructor(
     private flightService: FlightService,
     private smsService: SmsService,
+    private scheduleService: ScheduleService,
   ) {}
 
   async handleSchedule(schedule: Schedule) {
@@ -43,6 +45,7 @@ export class FlightNoticeService {
     // get flight data
     const { flights } = await this.flightService.getFlights(requestParams)
     this.logger.log(`getFlights count: ${flights.length}`)
+    this.scheduleService.updateDelayTime(schedule.id, !flights.length)
 
     // prepare change data
     const {
