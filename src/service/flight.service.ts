@@ -21,9 +21,6 @@ export class FlightService {
     if (result.data?.routeList) {
       const rawFlights = result.data.routeList.map((item) => {
         const leg = item.legs[0]
-        if (!leg.flight) {
-          this.logger.error(`no leg flight info: ${JSON.stringify(leg)}`)
-        }
         return {
           type: item.routeType,
           flight: leg.flight,
@@ -31,11 +28,14 @@ export class FlightService {
         }
       })
       return rawFlights.filter((raw) => {
+        const isDirectFlight = raw.type === 'Flight'
+        if (!isDirectFlight) {
+          return false
+        }
         const isSameFromPort =
           param.fromPort ==
           raw.flight.departureAirportInfo.airportTlc.toLowerCase()
-        const isDirectFlight = raw.type === 'Flight'
-        return isDirectFlight && (!param.fromPort || isSameFromPort)
+        return !param.fromPort || isSameFromPort
       })
     } else {
       this.logger.log(`getFlights empty result: ${JSON.stringify(result)}`)
