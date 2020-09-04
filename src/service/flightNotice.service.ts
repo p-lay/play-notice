@@ -87,6 +87,10 @@ export class FlightNoticeService {
       // 降价
       this.logger.warn(`flight exclude by price increase`)
       return false
+    } else if (priceChange.priceChangeFrom - priceChange.priceChangeTo < 100) {
+      // 降价100
+      this.logger.warn(`flight exclude by price decrease less than 100`)
+      return false
     }
     if (!filter) {
       this.logger.log(`flight include by no filter`)
