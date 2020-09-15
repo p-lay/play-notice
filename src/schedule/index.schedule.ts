@@ -23,6 +23,7 @@ export class NoticeSchedule {
       const scheduleAfterTime = getDayjsTime(schedule.scheduleAfterTime)
       const scheduleBeforeTime = getDayjsTime(schedule.scheduleBeforeTime)
 
+      this.logger.log(`schedule name: ${schedule.name}`)
       if (currentTime.isBefore(scheduleAfterTime)) {
         this.logger.warn(
           `schedule skip by scheduleAfterTime: ${schedule.scheduleAfterTime}`,
