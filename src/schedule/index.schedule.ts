@@ -13,7 +13,7 @@ export class NoticeSchedule {
     private flightNoticeService: FlightNoticeService,
   ) {}
 
-  @Cron('0 */20 * * * *', { name: 'noticeSchedule' })
+  @Cron(CronExpression.EVERY_2_HOURS, { name: 'noticeSchedule' })
   async runNoticeSchedule() {
     const currentTime = dayjs()
     this.logger.log(`start schedule at ${currentTime.format()}`)

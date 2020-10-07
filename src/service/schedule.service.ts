@@ -67,7 +67,7 @@ export class ScheduleService {
         !entity.scheduleDelayTime ||
         dayjs(entity.scheduleDelayTime).isBefore(dayjs())
       ) {
-        entity.scheduleDelayTime = dayjs().add(2, 'hour').format()
+        entity.scheduleDelayTime = dayjs().add(4, 'hour').format()
         await this.repo.save(entity)
       }
     } else {
